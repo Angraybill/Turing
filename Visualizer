@@ -1,0 +1,74 @@
+import java.util.Arrays;
+
+public class Beaver {
+
+    private Integer[] tape;
+    private String[] rules;
+    private int index;
+    private int rule;
+
+
+    public Beaver(int len, String[] rules) {
+        tape = new Integer[len * 2];
+        for (int i = 0; i < len * 2; i++) tape[i] = 0;
+        this.rules = rules;
+        index = len;
+        rule = 0;
+        p(rules[0]);
+    }
+
+    private boolean eval() {
+        String current = rules[rule + (rules.length / 2) * tape[index]];
+        if (current.equals("H"))
+            return false;
+        tape[index] = (int) current.charAt(0) - 48;
+        index += current.charAt(1) == 'R' ? 1 : -1;
+        rule = current.charAt(2) - 65;
+        p(current);
+        return !(index == -1 || index == tape.length * 2);
+    }
+
+    private void p(String current) {
+        String ret = "";
+        int ind = 0;
+        for (int i : tape) {
+            if (ind == index)
+                ret += "\u001B[33m";
+            else if (i == 0)
+                ret += "\u001B[31m";
+            else
+                ret += "\u001B[32m";
+
+            ret += i + "\u001B[0m";
+            ind++;
+        }
+        ret += " ";
+        ret += current;
+        System.out.println(ret);
+    }
+
+
+    public void run() {
+        int count = 0;
+        while (index < tape.length) {
+            count++;
+            if (!eval())
+                break;
+        }
+        p("");
+        System.out.println(count + " Iterations");
+    }
+
+    // Put a length and ruleset where it says, uncomment the line, and run
+    // 
+     public static void main(String[] args) {
+     //   Beaver t = new Beaver(INTEGER LENGTH, new String[] {RULES});
+        t.run();
+     }
+}
+
+// Example Rules: Shamelessly stolen from wikipedia https://en.wikipedia.org/wiki/Busy_beaver#Visualizations
+// 2 rules  -- 3 wide {"1RB", "1LA", "1LB", "H"}
+// 3 rules  -- 5 wide {"1RB", "0RC", "1LC", "H", "1RB", "1LA"}
+// 4 Rules  -- 12 wide {"1RB", "1LA", "H", "1RD", "1LB", "0LC", "1LD", "0RA"}
+// Skelet 1 (2542/∞ iterations) -- 81 wide {"1LC", "H", "1RD", "1LA", "0LB", "1LE", "1LD", "0LD", "1RE", "0RC"} 
